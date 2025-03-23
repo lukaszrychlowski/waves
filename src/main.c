@@ -4,22 +4,16 @@
 #include <time.h>
 #include <stdlib.h>
 #include <math.h>
+#include "callbacks.h"
+#include "shaders.h"
 
-#define BUFFER_SIZE 10
-
-void error_callback(int error, const char* description);
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-GLFWwindow* create_window(unsigned int width, unsigned int height);
-unsigned int build_vertex_shader(const char* vertexShaderSource);
-unsigned int build_fragment_shader(const char* fragmentShaderSource);
-unsigned int link_shaders(unsigned int vertexShader, unsigned int fragmentShader);
+#define BUFFER_SIZE 100
 
 const char* vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "void main()\n"
     "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0);\n"
     "   gl_PointSize = 1.0f;\n"
     "}\0";
 
@@ -27,8 +21,10 @@ const char* fragmentShaderSource = "#version 330 core\n"
     "out vec4 FragColor;\n"
     "void main()\n"
     "{\n"
-    "   FragColor = vec4(1.0f, 0.6f, 0.2f, 1.0f);\n"
+    "   FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
     "}\n\0";
+
+GLFWwindow* create_window(unsigned int width, unsigned int height);
 
 int main()
 {
@@ -36,12 +32,15 @@ int main()
   srand(time(NULL));
   int x = rand();
   int y = rand();
+  
   //init
-  glfwInit();
-  if (!glfwInit())
+  if(!glfwInit())
   {
-    fprintf(stderr, "failed to init glfw\n");
+	fprintf(stderr, "failed to init glfw\n");
+  	return 1;
   }
+  
+  //create window
   GLFWwindow* window = create_window(640, 480);
   
   //callbacks
@@ -56,19 +55,19 @@ int main()
   unsigned int shaderProgram = link_shaders(vertexShader, fragmentShader);
   
   //enable pointsize from shader
-  glEnable(GL_PROGRAM_POINT_SIZE);
+  //glEnable(GL_PROGRAM_POINT_SIZE);
   
   //set up vertex data, buffers, attributes
-  float vertices[BUFFER_SIZE * 3] = {};
+  float vertices[BUFFER_SIZE * 2] = {};
 
   for (int i = 0; i < BUFFER_SIZE; i++)
   {
 	float x = (float) i;
 	float y = sin((float)i / BUFFER_SIZE * 2.0F * M_PI);
 	
-	vertices[i * 3] = (2.0F * x / BUFFER_SIZE) - 1.0F;
-	vertices[i * 3 + 1] = y;
-       	vertices[i * 3 + 2] = 0.0F; 
+	vertices[i * 2] = (2.0F * x / BUFFER_SIZE) - 1.0F;
+	vertices[i * 2 + 1] = y;
+       	//vertices[i * 3 + 2] = 0.0F; 
   }
 
   unsigned int VBO, VAO;
@@ -77,9 +76,8 @@ int main()
   glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
-
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
@@ -87,12 +85,12 @@ int main()
   while(!glfwWindowShouldClose(window))
     {
       //bg color      
-      glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
+      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
       glUseProgram(shaderProgram);
       glBindVertexArray(VAO);
-      const float no_of_vertices = sizeof(vertices) / (3 * sizeof(float)); 
+      const float no_of_vertices = (float)BUFFER_SIZE;
       glDrawArrays(GL_LINE_STRIP, 0, no_of_vertices);
       glfwSwapBuffers(window);
       glfwPollEvents();
@@ -108,85 +106,17 @@ int main()
   return 0;
 }
 
-void error_callback(int error, const char* description)
-{
-  fprintf(stderr, "Err: %s\n", description);
-}
-
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-    {
-      glfwSetWindowShouldClose(window, GLFW_TRUE);
-    }
-}
-
 GLFWwindow* create_window(unsigned int width, unsigned int height)
 {
   GLFWwindow* window = glfwCreateWindow(width, height, "", NULL, NULL);
   glfwSetWindowAttrib(window, GLFW_RESIZABLE, GLFW_FALSE);
   if (!window)
-   {
+  {
      glfwTerminate();
      fprintf(stderr, "failed to create a window\n");
-   }
+  }
   glfwMakeContextCurrent(window);
   return window;
 }
 
-unsigned int build_vertex_shader(const char* vertexShaderSource)
-{
-  unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-  glCompileShader(vertexShader);
-  
-  int success;
-  char infoLog[512];
-  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-  if (!success)
-    {
-      glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-      printf("failed to compile vertex shader\n");
-      printf(infoLog);
-    }
-  return vertexShader;
-}
-
-unsigned int build_fragment_shader(const char* fragmentShaderSource)
-{
-  int success;
-  char infoLog[512];
-  unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragmentShader);
-  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-  if (!success)
-    {
-      glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-      printf("failed to compile fragment shader\n");
-      printf(infoLog);
-    }
-  return fragmentShader;
-}
-
-unsigned int link_shaders(unsigned int vertexShader, unsigned int fragmentShader)
-{
-  int success;
-  char infoLog[512];
-  unsigned int shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-  if (!success)
-    {
-      glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-      printf( "failed to compile shader program\n");
-      printf(infoLog);
-    }
-  //delete shaders after linking
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
-  return shaderProgram;
-}
   
