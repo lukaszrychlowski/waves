@@ -4,8 +4,10 @@
 #include <time.h>
 #include <stdlib.h>
 #include <math.h>
+#include <alsa/asoundlib.h>
 #include "callbacks.h"
-#include "shaders.h"
+#include "renderer.h"
+#include "window.h"
 
 #define BUFFER_SIZE 100
 
@@ -24,25 +26,12 @@ const char* fragmentShaderSource = "#version 330 core\n"
     "   FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
     "}\n\0";
 
-GLFWwindow* create_window(unsigned int width, unsigned int height);
 
 int main()
-{
-  //generate seed
-  srand(time(NULL));
-  int x = rand();
-  int y = rand();
-  
-  //init
-  if(!glfwInit())
-  {
-	fprintf(stderr, "failed to init glfw\n");
-  	return 1;
-  }
-  
-  //create window
-  GLFWwindow* window = create_window(640, 480);
-  
+{ 
+  GLFWwindow* window = window_init(640, 480);
+  if(!window) return -1;
+
   //callbacks
   glfwSetErrorCallback(error_callback);
   glfwSetKeyCallback(window, key_callback);
@@ -70,28 +59,13 @@ int main()
        	//vertices[i * 3 + 2] = 0.0F; 
   }
 
-  unsigned int VBO, VAO;
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-  glBindVertexArray(VAO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-
+  unsigned int VAO, VBO;
+  renderer_setup(&VAO, &VBO, sizeof(vertices), vertices);
+  
   //render loop
   while(!glfwWindowShouldClose(window))
     {
-      //bg color      
-      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-      glClear(GL_COLOR_BUFFER_BIT);
-
-      glUseProgram(shaderProgram);
-      glBindVertexArray(VAO);
-      const float no_of_vertices = (float)BUFFER_SIZE;
-      glDrawArrays(GL_LINE_STRIP, 0, no_of_vertices);
+      render_frame(shaderProgram, &VAO, (float)BUFFER_SIZE);
       glfwSwapBuffers(window);
       glfwPollEvents();
     }
@@ -102,21 +76,8 @@ int main()
   glDeleteProgram(shaderProgram);
 
   //terminate glfw
-  glfwTerminate();
+  window_cleanup(window);
   return 0;
-}
-
-GLFWwindow* create_window(unsigned int width, unsigned int height)
-{
-  GLFWwindow* window = glfwCreateWindow(width, height, "", NULL, NULL);
-  glfwSetWindowAttrib(window, GLFW_RESIZABLE, GLFW_FALSE);
-  if (!window)
-  {
-     glfwTerminate();
-     fprintf(stderr, "failed to create a window\n");
-  }
-  glfwMakeContextCurrent(window);
-  return window;
 }
 
   

@@ -1,10 +1,7 @@
-#ifndef SHADERS_H
-#define SHADERS_H
-
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-#include "shaders.h"
+#include "renderer.h"
 
 unsigned int build_vertex_shader(const char* vertexShaderSource)
 {
@@ -59,5 +56,25 @@ unsigned int link_shaders(unsigned int vertexShader, unsigned int fragmentShader
   return shaderProgram;
 }
 
-#endif
+unsigned int renderer_setup(unsigned int* VAO, unsigned int* VBO, size_t size_vertices, float* vertices)
+{ 
+    //float foo[200] = {0};
+    glGenVertexArrays(1, VAO);
+    glGenBuffers(1, VBO);
+    glBindVertexArray(*VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+    glBufferData(GL_ARRAY_BUFFER, size_vertices, vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
 
+void render_frame(unsigned int shader_program, unsigned int* VAO, float no_of_vertices)
+{
+    glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glUseProgram(shader_program);
+    glBindVertexArray(*VAO);
+    glDrawArrays(GL_LINE_STRIP, 0, no_of_vertices); 
+}
