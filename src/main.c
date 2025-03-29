@@ -71,11 +71,7 @@ int main()
     }
 
   //deallocate resources
-  glDeleteVertexArrays(1, &VAO);
-  glDeleteBuffers(1, &VBO);
-  glDeleteProgram(shaderProgram);
-
-  //terminate glfw
+  renderer_cleanup(VAO, VBO, shaderProgram);
   window_cleanup(window);
   return 0;
 }

@@ -78,3 +78,10 @@ void render_frame(unsigned int shader_program, unsigned int* VAO, float no_of_ve
     glBindVertexArray(*VAO);
     glDrawArrays(GL_LINE_STRIP, 0, no_of_vertices); 
 }
+
+void renderer_cleanup(unsigned int VAO, unsigned int VBO, unsigned int shaderProgram)
+{
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteProgram(shaderProgram);
+}
