@@ -75,7 +75,7 @@ void render_frame(unsigned int* shader_program, unsigned int* VAO, float no_of_v
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(*shader_program);
     glBindVertexArray(*VAO);
-    glDrawArrays(GL_POINTS, 0, no_of_vertices); 
+    glDrawArrays(GL_LINE_STRIP, 0, no_of_vertices); 
 }
 
 void renderer_cleanup(unsigned int* VAO, unsigned int* VBO, unsigned int* shaderProgram)

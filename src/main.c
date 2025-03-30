@@ -9,15 +9,22 @@
 #include "renderer.h"
 #include "window.h"
 
-#define BUFFER_SIZE 100
+#define BUFFER_SIZE 10
+
+static float map(float val, float in_min, float in_max, float out_min, float out_max);
 
 const char* vertexShaderSource = "#version 460 core\n"
     "layout (location = 0) in float y;\n"
+    "float map(float val, float in_min, float in_max, float out_min, float out_max)\n"
+    "{\n"
+    "   return out_min + (out_max - out_min) * (val - in_min) / (in_max - in_min); \n"
+    "}\n"
     "void main()\n"
     "{\n"
-    "   float index = float(gl_VertexID); \n"
-    "   gl_Position = vec4(-1.0 + 2.0 * (index / 100.0), y, 0.0, 1.0);\n"
-    "   gl_PointSize = 5.0f;\n"
+    "   float x = map((float(gl_VertexID)), 0.0, 9.0, -1.0, 1.0); \n"
+    "   float val = map(y, -1.0, 1.0, -1.0, 1.0);\n"
+    "   gl_Position = vec4(x, y, 0.0, 1.0);\n"
+    "   gl_PointSize = 1.0f;\n"
     "}\0";
 
 const char* fragmentShaderSource = "#version 460 core\n"
@@ -49,8 +56,12 @@ int main()
   
   //set up vertex data, buffers, attributes
   float vertices[BUFFER_SIZE];
-  for (int i = 0; i < BUFFER_SIZE; i++) vertices[i] = sin(((float)i / 100.0F)  * 2.0F * M_PI);
-
+  for (int i = 0; i < BUFFER_SIZE; i++)
+  {   
+      float j = map((float)i, 0.0F, BUFFER_SIZE-1.0F, -1.0, 1.0);
+      vertices[i] = sin(j * 2.0F * M_PI);
+      //printf("%.9f\n", sin((float)i * 2.0 * M_PI));
+  }
   unsigned int VAO, VBO;
   renderer_setup(&VAO, &VBO, sizeof(vertices), vertices);
   
@@ -68,4 +79,7 @@ int main()
   return 0;
 }
 
-  
+static float map(float val, float in_min, float in_max, float out_min, float out_max)
+{   
+    return out_min + (out_max - out_min) * (val - in_min) / (in_max - in_min);
+}
