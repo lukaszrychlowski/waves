@@ -49,16 +49,7 @@ int main()
   
   //set up vertex data, buffers, attributes
   float vertices[BUFFER_SIZE];
-
-  for (int i = 0; i < BUFFER_SIZE; i++)
-  {
-	//float x = (float) i;
-	float y = sin(((float)i / 100.0F)  * 2.0F * M_PI);
-	//printf("%.9f\n", y);
-	//vertices[i] = (2.0F * x / BUFFER_SIZE) - 1.0F;
-	vertices[i] = y;
-       	//vertices[i * 3 + 2] = 0.0F; 
-  }
+  for (int i = 0; i < BUFFER_SIZE; i++) vertices[i] = sin(((float)i / 100.0F)  * 2.0F * M_PI);
 
   unsigned int VAO, VBO;
   renderer_setup(&VAO, &VBO, sizeof(vertices), vertices);

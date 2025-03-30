@@ -58,7 +58,6 @@ unsigned int link_shaders(unsigned int vertexShader, unsigned int fragmentShader
 
 void renderer_setup(unsigned int* VAO, unsigned int* VBO, size_t size_vertices, float* vertices)
 { 
-    //float foo[200] = {0};
     glGenVertexArrays(1, VAO);
     glGenBuffers(1, VBO);
     glBindVertexArray(*VAO);
