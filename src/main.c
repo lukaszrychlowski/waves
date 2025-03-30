@@ -1,10 +1,10 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
+
 #include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
 #include <math.h>
-#include <alsa/asoundlib.h>
+
 #include "callbacks.h"
 #include "renderer.h"
 #include "window.h"
@@ -29,7 +29,7 @@ const char* fragmentShaderSource = "#version 330 core\n"
 
 int main()
 { 
-  GLFWwindow* window = window_init(640, 480);
+  GLFWwindow* window = window_init(WINDOW_WIDTH, WINDOW_HEIGHT);
   if(!window) return -1;
 
   //callbacks
@@ -47,7 +47,7 @@ int main()
   //glEnable(GL_PROGRAM_POINT_SIZE);
   
   //set up vertex data, buffers, attributes
-  float vertices[BUFFER_SIZE * 2] = {};
+  float vertices[BUFFER_SIZE * 2];
 
   for (int i = 0; i < BUFFER_SIZE; i++)
   {
@@ -65,13 +65,13 @@ int main()
   //render loop
   while(!glfwWindowShouldClose(window))
     {
-      render_frame(shaderProgram, &VAO, (float)BUFFER_SIZE);
+      render_frame(&shaderProgram, &VAO, (float)BUFFER_SIZE);
       glfwSwapBuffers(window);
       glfwPollEvents();
     }
 
   //deallocate resources
-  renderer_cleanup(VAO, VBO, shaderProgram);
+  renderer_cleanup(&VAO, &VBO, &shaderProgram);
   window_cleanup(window);
   return 0;
 }

@@ -56,7 +56,7 @@ unsigned int link_shaders(unsigned int vertexShader, unsigned int fragmentShader
   return shaderProgram;
 }
 
-unsigned int renderer_setup(unsigned int* VAO, unsigned int* VBO, size_t size_vertices, float* vertices)
+void renderer_setup(unsigned int* VAO, unsigned int* VBO, size_t size_vertices, float* vertices)
 { 
     //float foo[200] = {0};
     glGenVertexArrays(1, VAO);
@@ -70,18 +70,18 @@ unsigned int renderer_setup(unsigned int* VAO, unsigned int* VBO, size_t size_ve
     glBindVertexArray(0);
 }
 
-void render_frame(unsigned int shader_program, unsigned int* VAO, float no_of_vertices)
+void render_frame(unsigned int* shader_program, unsigned int* VAO, float no_of_vertices)
 {
     glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT);
-    glUseProgram(shader_program);
+    glUseProgram(*shader_program);
     glBindVertexArray(*VAO);
     glDrawArrays(GL_LINE_STRIP, 0, no_of_vertices); 
 }
 
-void renderer_cleanup(unsigned int VAO, unsigned int VBO, unsigned int shaderProgram)
+void renderer_cleanup(unsigned int* VAO, unsigned int* VBO, unsigned int* shaderProgram)
 {
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, VAO);
+    glDeleteBuffers(1, VBO);
     glDeleteProgram(shaderProgram);
 }
