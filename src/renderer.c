@@ -64,7 +64,7 @@ void renderer_setup(unsigned int* VAO, unsigned int* VBO, size_t size_vertices, 
     glBindVertexArray(*VAO);
     glBindBuffer(GL_ARRAY_BUFFER, *VBO);
     glBufferData(GL_ARRAY_BUFFER, size_vertices, vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -76,7 +76,7 @@ void render_frame(unsigned int* shader_program, unsigned int* VAO, float no_of_v
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(*shader_program);
     glBindVertexArray(*VAO);
-    glDrawArrays(GL_LINE_STRIP, 0, no_of_vertices); 
+    glDrawArrays(GL_POINTS, 0, no_of_vertices); 
 }
 
 void renderer_cleanup(unsigned int* VAO, unsigned int* VBO, unsigned int* shaderProgram)

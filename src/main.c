@@ -11,15 +11,16 @@
 
 #define BUFFER_SIZE 100
 
-const char* vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
+const char* vertexShaderSource = "#version 460 core\n"
+    "layout (location = 0) in float y;\n"
     "void main()\n"
     "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0);\n"
-    "   gl_PointSize = 1.0f;\n"
+    "   float index = float(gl_VertexID); \n"
+    "   gl_Position = vec4(-1.0 + 2.0 * (index / 100.0), y, 0.0, 1.0);\n"
+    "   gl_PointSize = 5.0f;\n"
     "}\0";
 
-const char* fragmentShaderSource = "#version 330 core\n"
+const char* fragmentShaderSource = "#version 460 core\n"
     "out vec4 FragColor;\n"
     "void main()\n"
     "{\n"
@@ -44,18 +45,18 @@ int main()
   unsigned int shaderProgram = link_shaders(vertexShader, fragmentShader);
   
   //enable pointsize from shader
-  //glEnable(GL_PROGRAM_POINT_SIZE);
+  glEnable(GL_PROGRAM_POINT_SIZE);
   
   //set up vertex data, buffers, attributes
-  float vertices[BUFFER_SIZE * 2];
+  float vertices[BUFFER_SIZE];
 
   for (int i = 0; i < BUFFER_SIZE; i++)
   {
-	float x = (float) i;
-	float y = sin((float)i / BUFFER_SIZE * 2.0F * M_PI);
-	
-	vertices[i * 2] = (2.0F * x / BUFFER_SIZE) - 1.0F;
-	vertices[i * 2 + 1] = y;
+	//float x = (float) i;
+	float y = sin(((float)i / 100.0F)  * 2.0F * M_PI);
+	//printf("%.9f\n", y);
+	//vertices[i] = (2.0F * x / BUFFER_SIZE) - 1.0F;
+	vertices[i] = y;
        	//vertices[i * 3 + 2] = 0.0F; 
   }
 
