@@ -8,6 +8,7 @@
 #include "callbacks.h"
 #include "renderer.h"
 #include "window.h"
+#include "sound.h"
 
 #define BUFFER_SIZE 10
 
@@ -32,7 +33,7 @@ const char* fragmentShaderSource = "#version 460 core\n"
     "void main()\n"
     "{\n"
     "   FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
-    "}\n\0";
+    "}\0";
 
 
 int main()
@@ -60,11 +61,10 @@ int main()
   {   
       float j = map((float)i, 0.0F, BUFFER_SIZE-1.0F, -1.0, 1.0);
       vertices[i] = sin(j * 2.0F * M_PI);
-      //printf("%.9f\n", sin((float)i * 2.0 * M_PI));
   }
   unsigned int VAO, VBO;
   renderer_setup(&VAO, &VBO, sizeof(vertices), vertices);
-  
+  capture_audio();
   //render loop
   while(!glfwWindowShouldClose(window))
     {
