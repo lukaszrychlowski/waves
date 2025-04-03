@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <pthread.h>
 
 #include "callbacks.h"
 #include "renderer.h"
@@ -64,7 +65,15 @@ int main()
   }
   unsigned int VAO, VBO;
   renderer_setup(&VAO, &VBO, sizeof(vertices), vertices);
-  capture_audio();
+  //threads
+  pthread_t thread;
+  int rc = pthread_create(&thread, NULL, capture_audio, NULL);  
+  if(rc)
+  {
+    printf("pthread_create failed\n");
+    return -1;
+  }
+  //capture_audio();
   //render loop
   while(!glfwWindowShouldClose(window))
     {

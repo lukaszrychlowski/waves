@@ -3,7 +3,7 @@
 #include <alsa/asoundlib.h>
 #include <stdio.h>
 
-void capture_audio();
+void *capture_audio();
 
 #endif
 

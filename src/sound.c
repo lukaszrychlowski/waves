@@ -1,6 +1,6 @@
 #include <sound.h>
 
-void capture_audio()
+void *capture_audio()
 {
     snd_pcm_t* handle;
     snd_pcm_open(&handle, "plughw:CARD=LCSUSBAudio,DEV=0", SND_PCM_STREAM_CAPTURE, 0);
@@ -14,6 +14,7 @@ void capture_audio()
     }
 
     snd_pcm_close(handle);
+    pthread_exit(NULL);
 }
 
 
